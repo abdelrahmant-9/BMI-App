@@ -1,4 +1,4 @@
-import 'package:bmi/Calculate_BMI.dart';
+import 'package:bmi/ui/calculate_bmi_screen.dart';
 import 'package:bmi/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -61,7 +61,7 @@ class OnboardingScreen extends StatelessWidget {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const BmiScreen()),
+                                builder: (context) => const CalculateBmiScreen()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

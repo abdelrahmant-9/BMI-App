@@ -1,21 +1,76 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'ResultPage.dart';
-import 'core/theme/colors.dart';
+import 'package:bmi/ui/result_page.dart';
+import 'package:bmi/core/theme/colors.dart';
 
-class BmiScreen extends StatefulWidget {
-  const BmiScreen({super.key});
+class CalculateBmiScreen extends StatefulWidget {
+  const CalculateBmiScreen({super.key});
 
   @override
-  State<BmiScreen> createState() => _BmiScreenState();
+  State<CalculateBmiScreen> createState() => _CalculateBmiScreenState();
 }
 
-class _BmiScreenState extends State<BmiScreen> {
+class _CalculateBmiScreenState extends State<CalculateBmiScreen> {
   bool isMale = true;
 
-  final TextEditingController heightController =
-  TextEditingController(text: '170');
-  final TextEditingController weightController =
-  TextEditingController(text: '70');
+  final nameController = TextEditingController();
+  final birthDateController = TextEditingController();
+  final heightController = TextEditingController(text: '170');
+  final weightController = TextEditingController(text: '70');
+
+  void _calculateAndNavigate() {
+    final height = double.tryParse(heightController.text) ?? 0;
+    final weight = double.tryParse(weightController.text) ?? 0;
+
+    if (height <= 0 || weight <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter valid height and weight.')),
+      );
+      return;
+    }
+
+    final bmi = weight / pow(height / 100, 2);
+    int age = 0;
+    if (birthDateController.text.isNotEmpty) {
+      try {
+        final birthDate = DateTime.parse(birthDateController.text);
+        final today = DateTime.now();
+        age = today.year - birthDate.year;
+        if (today.month < birthDate.month ||
+            (today.month == birthDate.month && today.day < birthDate.day)) {
+          age--;
+        }
+      } catch (e) { age = 0; }
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+          name: nameController.text,
+          age: age,
+          height: height,
+          weight: weight,
+          isMale: isMale,
+          bmi: bmi,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        birthDateController.text = "${picked.toLocal()}".split(' ')[0];
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +83,7 @@ class _BmiScreenState extends State<BmiScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
+                const Center(
                   child: Text(
                     'B M I',
                     style: TextStyle(
@@ -38,22 +93,20 @@ class _BmiScreenState extends State<BmiScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 40),
-
                 _label('Name'),
-                _normalTextField(),
-
+                _normalTextField(controller: nameController),
                 const SizedBox(height: 20),
-
                 _label('Birth Date'),
-                _normalTextField(),
-
+                _normalTextField(
+                  controller: birthDateController,
+                  readOnly: true,
+                  onTap: () => _selectDate(context),
+                  suffixIcon: const Icon(Icons.calendar_today, color: AppColors.darkPurple),
+                ),
                 const SizedBox(height: 20),
-
                 _label('Choose Gender'),
                 const SizedBox(height: 15),
-
                 Row(
                   children: [
                     _genderCard(
@@ -71,33 +124,22 @@ class _BmiScreenState extends State<BmiScreen> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 30),
-
                 numberStepperField(
                   title: 'Your Height (cm)',
                   controller: heightController,
                 ),
-
                 const SizedBox(height: 20),
-
                 numberStepperField(
                   title: 'Your Weight (kg)',
                   controller: weightController,
                 ),
-
                 const SizedBox(height: 50),
-
                 SizedBox(
                   width: double.infinity,
                   height: 45,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const BmiResultPage()),
-                      );
-                    },
+                    onPressed: _calculateAndNavigate,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.darkPurple,
                       shape: RoundedRectangleBorder(
@@ -122,21 +164,22 @@ class _BmiScreenState extends State<BmiScreen> {
     );
   }
 
-  // ================= Widgets =================
-
   Widget _label(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 16,
-        color: AppColors.graylabel,
-      ),
-    );
+    return Text(text, style: const TextStyle(fontSize: 16, color: AppColors.graylabel));
   }
 
-  Widget _normalTextField() {
+  Widget _normalTextField({
+    required TextEditingController controller,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    Widget? suffixIcon,
+  }) {
     return TextField(
+      controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
       decoration: InputDecoration(
+        suffixIcon: suffixIcon,
         filled: true,
         fillColor: const Color(0xFFF1F3FA),
         border: OutlineInputBorder(
@@ -169,12 +212,9 @@ class _BmiScreenState extends State<BmiScreen> {
                 onTap: () {
                   int value = int.tryParse(controller.text) ?? 0;
                   if (value > 0) value--;
-                  controller.text = value.toString();
-                  setState(() {});
+                  setState(() => controller.text = value.toString());
                 },
-                child: const Icon(Icons.remove,
-                    size: 40,color: AppColors.darkPurple,
-                ),
+                child: const Icon(Icons.remove, size: 40, color: AppColors.darkPurple),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -182,14 +222,8 @@ class _BmiScreenState extends State<BmiScreen> {
                   controller: controller,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    isDense: true,
-                  ),
+                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+                  decoration: const InputDecoration(border: InputBorder.none, isDense: true),
                 ),
               ),
               const SizedBox(width: 12),
@@ -197,12 +231,9 @@ class _BmiScreenState extends State<BmiScreen> {
                 onTap: () {
                   int value = int.tryParse(controller.text) ?? 0;
                   value++;
-                  controller.text = value.toString();
-                  setState(() {});
+                  setState(() => controller.text = value.toString());
                 },
-                child: const Icon(Icons.add,
-                  size: 40,color: AppColors.darkPurple,
-                ),
+                child: const Icon(Icons.add, size: 40, color: AppColors.darkPurple),
               ),
             ],
           ),
@@ -228,28 +259,14 @@ class _BmiScreenState extends State<BmiScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: isSelected
-                      ?  Color(0xff484783)
-                      : Colors.transparent,
+                  color: isSelected ? const Color(0xff484783) : Colors.transparent,
                   width: 2,
                 ),
-                image: DecorationImage(
-                  image: AssetImage(imagePath),
-                  fit: BoxFit.cover,
-                ),
+                image: DecorationImage(image: AssetImage(imagePath), fit: BoxFit.cover),
               ),
             ),
-
             const SizedBox(height: 10),
-
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                color: AppColors.graylabel,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+            Text(title, style: const TextStyle(fontSize: 16, color: AppColors.graylabel, fontWeight: FontWeight.w500)),
           ],
         ),
       ),

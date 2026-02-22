@@ -1,4 +1,4 @@
-import 'package:bmi/onboarding_screen.dart';
+import 'package:bmi/ui/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
