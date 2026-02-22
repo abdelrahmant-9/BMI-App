@@ -37,7 +37,7 @@ The app provides a smooth experience from entering data to viewing personalized 
 ### 📸 App Preview
 
 <p align="center">
-  <img src="screenshots/input.png.jpg" width="250"/>
+  <img src="screenshots/onboarding.png.jpg" width="250"/>
   <img src="screenshots/input.png.jpg" width="250"/>
   <img src="screenshots/result.png.jpg" width="250"/>
 </p>
