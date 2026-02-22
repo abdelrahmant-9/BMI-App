@@ -15,7 +15,7 @@ class _CalculateBmiScreenState extends State<CalculateBmiScreen> {
 
   final nameController = TextEditingController();
   final birthDateController = TextEditingController();
-  final heightController = TextEditingController(text: '170');
+  final heightController = TextEditingController(text: '180');
   final weightController = TextEditingController(text: '70');
 
   void _calculateAndNavigate() {
@@ -77,88 +77,97 @@ class _CalculateBmiScreenState extends State<CalculateBmiScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Center(
-                  child: Text(
-                    'B M I',
-                    style: TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.lightgreen,
-                    ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Center(
+                        child: Text(
+                          'B M I',
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.lightgreen,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      _label('Name'),
+                      _normalTextField(controller: nameController),
+                      const SizedBox(height: 20),
+                      _label('Birth Date'),
+                      _normalTextField(
+                        controller: birthDateController,
+                        readOnly: true,
+                        onTap: () => _selectDate(context),
+                        suffixIcon: const Icon(Icons.calendar_today, color: AppColors.darkPurple),
+                      ),
+                      const SizedBox(height: 20),
+                      _label('Choose Gender'),
+                      const SizedBox(height: 15),
+                      Row(
+                        children: [
+                          _genderCard(
+                            title: 'Male',
+                            imagePath: 'assets/images/male.png',
+                            isSelected: isMale,
+                            onTap: () => setState(() => isMale = true),
+                          ),
+                          const SizedBox(width: 40),
+                          _genderCard(
+                            title: 'Female',
+                            imagePath: 'assets/images/female.png',
+                            isSelected: !isMale,
+                            onTap: () => setState(() => isMale = false),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 30),
+                      numberStepperField(
+                        title: 'Your Height (cm)',
+                        controller: heightController,
+                      ),
+                      const SizedBox(height: 20),
+                      numberStepperField(
+                        title: 'Your Weight (kg)',
+                        controller: weightController,
+                      ),
+                      const SizedBox(height: 20), // Added padding at the end of scroll view
+                    ],
                   ),
                 ),
-                const SizedBox(height: 40),
-                _label('Name'),
-                _normalTextField(controller: nameController),
-                const SizedBox(height: 20),
-                _label('Birth Date'),
-                _normalTextField(
-                  controller: birthDateController,
-                  readOnly: true,
-                  onTap: () => _selectDate(context),
-                  suffixIcon: const Icon(Icons.calendar_today, color: AppColors.darkPurple),
-                ),
-                const SizedBox(height: 20),
-                _label('Choose Gender'),
-                const SizedBox(height: 15),
-                Row(
-                  children: [
-                    _genderCard(
-                      title: 'Male',
-                      imagePath: 'assets/images/male.png',
-                      isSelected: isMale,
-                      onTap: () => setState(() => isMale = true),
-                    ),
-                    const SizedBox(width: 40),
-                    _genderCard(
-                      title: 'Female',
-                      imagePath: 'assets/images/female.png',
-                      isSelected: !isMale,
-                      onTap: () => setState(() => isMale = false),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                numberStepperField(
-                  title: 'Your Height (cm)',
-                  controller: heightController,
-                ),
-                const SizedBox(height: 20),
-                numberStepperField(
-                  title: 'Your Weight (kg)',
-                  controller: weightController,
-                ),
-                const SizedBox(height: 50),
-                SizedBox(
-                  width: double.infinity,
-                  height: 45,
-                  child: ElevatedButton(
-                    onPressed: _calculateAndNavigate,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.darkPurple,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      'Calculate BMI',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: _calculateAndNavigate,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.darkPurple,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Calculate BMI',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
