@@ -157,7 +157,7 @@ class BmiResultPage extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 80),
               SizedBox(
                 width: 332,
                 height: 45,
