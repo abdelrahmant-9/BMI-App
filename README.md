@@ -34,10 +34,6 @@ The app provides a smooth experience from entering data to viewing personalized 
 
 ---
 
-## 📱 Screenshots
-
-📌 Create a folder called `screenshots` and add your images inside it.
-
 ### 📸 App Preview
 
 <p align="center">
